@@ -106,3 +106,4 @@ Resources:
         - arn:aws:iam::aws:policy/service-role/AmazonEC2RoleforSSM
       RoleName: EC2RoleforSSM
 
+#modify 20191004
