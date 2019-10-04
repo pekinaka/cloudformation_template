@@ -1,0 +1,108 @@
+Metadata: 
+  AWS::CloudFormation::Interface: 
+    ParameterGroups: 
+      - 
+        Label: 
+          default: "VPC Configuration"
+        Parameters: 
+          - VPCName
+          - VPCCidrBlock
+
+      - 
+        Label: 
+          default: "PublicSubnet Configuration"
+        Parameters: 
+          - PublicSubnetName
+          - PublicSubnetCidrBlock
+          - PublicSubnetAZ
+
+      -
+        Label: 
+          default: "PrivateSubnet Configuration"
+        Parameters: 
+          - PrivateSubnetName
+          - PrivateSubnetCidrBlock
+          - PrivateSubnetAZ
+
+Parameters:
+  VPCCidrBlock:
+    Description: CidrBlock of new VPC(ex.192.168.0.0/16)
+    Type: String
+  VPCName:
+    Description: Name Tag of new VPC
+    Type: String
+  PublicSubnetCidrBlock:
+    Description: CidrBlock of new Public Subnet(ex.192.168.10.0/24)
+    Type: String
+  PublicSubnetName:
+    Description: Name Tag of new Public Subnet
+    Type: String
+  PublicSubnetAZ:
+    Description: AZ of new Public Subnet
+    Type: String
+    AllowedValues:
+      - ap-northeast-1a
+      - ap-northeast-1c
+      - ap-northeast-1d
+  PrivateSubnetCidrBlock:
+    Description: CidrBlofk of new Public Subnet(ex.192.168.20.0/24)
+    Type: String
+  PrivateSubnetName:
+    Description: Name Tag of new Public Subnet
+    Type: String
+  PrivateSubnetAZ:
+    Description: AZ of new Public Subnet
+    Type: String
+    AllowedValues:
+      - ap-northeast-1a
+      - ap-northeast-1c
+      - ap-northeast-1d
+
+Resources:
+
+#Create VPC
+  CreateVPC:
+    Type: AWS::EC2::VPC
+    DeletionPolicy: Retain
+    Properties: 
+      CidrBlock: !Ref VPCCidrBlock
+      EnableDnsSupport: true
+      EnableDnsHostnames: false
+      InstanceTenancy: default
+      Tags:
+        - Key: Name
+          Value: !Ref VPCName
+
+#Create Subnet
+  CreatePublicSubnet:
+    Type: AWS::EC2::Subnet
+    DeletionPolicy: Retain
+    Properties:
+      AvailabilityZone: !Ref PublicSubnetAZ
+      CidrBlock: !Ref PublicSubnetCidrBlock
+      Tags:
+        - Key: Name
+          Value: !Ref PublicSubnetName
+      VpcId: !Ref CreateVPC
+
+  CreatePrivateSubnet:
+    Type: AWS::EC2::Subnet
+    DeletionPolicy: Retain
+    Properties:
+      AvailabilityZone: !Ref PrivateSubnetAZ
+      CidrBlock: !Ref PrivateSubnetCidrBlock
+      Tags:
+        - Key: Name
+          Value: !Ref PrivateSubnetName
+      VpcId: !Ref CreateVPC
+
+#Create Role
+  CreateRoleForSSM:
+    Type: AWS::IAM::Role
+    DeletionPolicy: Retain
+    Properties: 
+      AssumeRolePolicyDocument: {"Version": "2012-10-17","Statement": [{"Effect": "Allow","Principal": {"Service": "ec2.amazonaws.com"},"Action": "sts:AssumeRole"}]}
+      ManagedPolicyArns: 
+        - arn:aws:iam::aws:policy/service-role/AmazonEC2RoleforSSM
+      RoleName: EC2RoleforSSM
+
