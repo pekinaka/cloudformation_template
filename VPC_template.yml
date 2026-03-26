@@ -95,16 +95,3 @@ Resources:
         - Key: Name
           Value: !Ref PrivateSubnetName
       VpcId: !Ref CreateVPC
-
-#Create Role
-  CreateRoleForSSM:
-    Type: AWS::IAM::Role
-    DeletionPolicy: Retain
-    Properties: 
-      AssumeRolePolicyDocument: {"Version": "2012-10-17","Statement": [{"Effect": "Allow","Principal": {"Service": "ec2.amazonaws.com"},"Action": "sts:AssumeRole"}]}
-      ManagedPolicyArns: 
-        - arn:aws:iam::aws:policy/service-role/AmazonEC2RoleforSSM
-      RoleName: EC2RoleforSSM
-
-#modify 20191004
-#modify second
